@@ -23,6 +23,10 @@ const txSchema = mongoose.Schema({
         type: Date,
         required: true
     },
+    memo: {
+        type: String,
+        required: true
+    },
     amount: {
         type: String,
         required: true

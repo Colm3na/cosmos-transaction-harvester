@@ -32,18 +32,38 @@ const extractSignatures = (signatures) => {
     let hashes = [];
     signatures.forEach( signature => {
         let buf = Buffer.from(signature, 'base64');
-        console.log('\n\n SIGNATURE', signature)
         let txHash = sha256(buf);
         hashes.push(txHash);
     })
     return hashes;
 }
 
+const checkIsLunie = async (tx) => {
+    if (memo.match(isLunie)) {
+        console.log('\n\n Lunie transaction!!!!!!!!!!')
+        let newTX = new TX({
+            hash: txHash,
+            kind: txType,
+            timestamp: txTimeStamp,
+            amount: txAmount,
+            from_addr: txFromAddress,
+            to_addr: txToAddress,
+            delegator_addr: txDelAddress,
+            validator_addr: txValAddress,
+            vote: {
+                proposal_id: txProposalID,
+                option: txVoteOption,
+            },
+        })
+        await TX.save();
+    }
+}
+
 // setInterval( () => {
     // axios.get(`${baseURL}/blocks/latest`)
-    axios.get(`${baseURL}/blocks/1154113`) // Searching for a 'Sent from Lunie' memo
+    axios.get(`${baseURL}/blocks/30227`) // Searching for a 'Sent from Lunie' memo
     .then( data => {
-        console.log(data.data)
+
         CURRENT_BLOCK = data.data.block.header.height;
         NEXT_BLOCK = data.data.block.header.height;
 
@@ -77,73 +97,48 @@ const getTx = async (hash) => {
 
     await axios.get(`${baseURL}/txs/${hash}`)
     .then( (data) => {
-        const memo = data.data.tx.value.memo;
-        const txHash = data.data.txhash;
-        const txType = data.data.tx.value.msg[0].type;
-        const txTimeStamp = data.data.timestamp;
-        let txAmount;
-        if (data.data.tx.value.fee.amount !== null) {
-            txAmount = data.data.tx.value.fee.amount[0].amount;
-        } else {
-            txAmount = '0';
-        }
-        let txFromAddress;
-        let txToAddress;
-        let txDelAddress;
-        let txValAddress;
-        let txProposalID;
-        let txVoteOption;
+        console.log('\n\n PAY ATTENTION', data.data.tx.value.msg[0])
+        let newTX = new TX;
 
-        switch(txType) {
+        newTX.memo = data.data.tx.value.memo;
+        newTX.hash = data.data.txhash;
+        newTX.kind = data.data.tx.value.msg[0].type;
+        newTX.timestamp = data.data.timestamp;
+
+        if (data.data.tx.value.fee.amount !== null) {
+            newTX.amount = data.data.tx.value.fee.amount[0].amount;
+        } else {
+            newTX.amount = '0';
+        }
+
+        switch(newTX.kind) {
             case 'cosmos-sdk/MsgSend':
-                txFromAddress = data.data.tx.value.msg[0].value.from_address;
-                txToAddress = data.data.tx.value.msg[0].value.to_address;
+                newTX.from_addr = data.data.tx.value.msg[0].value.from_address;
+                newTX.to_addr = data.data.tx.value.msg[0].value.to_address;
                 break;
             case 'cosmos-sdk/MsgWithdrawDelegationReward':
-                txDelAddress = data.data.tx.value.msg[0].value.delegator_address;
-                txValAddress = [];
+                newTX.delegator_addr = data.data.tx.value.msg[0].value.delegator_address;
+                newTX.validator_addr = [];
                 
                 for( let i = 0; i < data.data.tx.value.msg.length; i++) {
-                    txValAddress.push(data.data.tx.value.msg[i].value.validator_address)
+                    newTX.validator_addr.push(data.data.tx.value.msg[i].value.validator_address)
                 }
                 break;
             case 'cosmos-sdk/MsgVote':
-                txProposalID = data.data.tx.value.msg[0].value.proposal_id;
-                txVoteOption = data.data.tx.value.msg[0].value.option;
+                newTX.vote.proposal_id = data.data.tx.value.msg[0].value.proposal_id;
+                newTX.vote.option = data.data.tx.value.msg[0].value.option;
+                break;
+            case 'cosmos-sdk/MsgDelegate':
+                newTX.delegator_addr = data.data.tx.value.msg[0].value.delegator_address;
+                newTX.validator_addr = data.data.tx.value.msg[0].value.validator_address;
+                newTX.amount = data.data.tx.value.msg[0].value.amount.amount;
                 break;
             default:
                 break;
         }
 
-        console.log(`MEMO is`, memo)
-        console.log(`TX is`, txHash)
-        console.log(`TXTYPE is`, txType)
-        console.log(`TXTimestamp is`, txTimeStamp)
-        console.log(`TXAmount is`, txAmount)
-        console.log(`txFromAddress is`, txFromAddress)
-        console.log(`txToAddress is`, txToAddress)
-        console.log(`TXDelAddr is`, txDelAddress)
-        console.log(`TXValAddr is`, txValAddress)
-        console.log(`TXProposalID is`, txProposalID)
-        console.log(`TXVoteOption is`, txVoteOption)
+        console.log(`\n\n NEW TX is`, newTX)
 
-        if (memo.match(isLunie)) {
-            console.log('\n\n Lunie transaction!!!!!!!!!!')
-            let newTX = new TX({
-                hash: txHash,
-                kind: txType,
-                timestamp: txTimeStamp,
-                amount: txAmount,
-                from_addr: txFromAddress,
-                to_addr: txToAddress,
-                delegator_addr: txDelAddress,
-                validator_addr: txValAddress,
-                vote: {
-                    proposal_id: txProposalID,
-                    option: txVoteOption,
-                },
-            })
-        }
     })
     .catch( (error) => {
         console.log(error);
