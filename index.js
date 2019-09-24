@@ -41,7 +41,7 @@ const extractSignatures = (signatures) => {
 
 // setInterval( () => {
     // axios.get(`${baseURL}/blocks/latest`)
-    axios.get(`${baseURL}/blocks/1932958`)
+    axios.get(`${baseURL}/blocks/893152`) // Searching for a 'Sent from Lunie' memo
     .then( data => {
         console.log(data.data)
         CURRENT_BLOCK = data.data.block.header.height;
@@ -52,7 +52,7 @@ const extractSignatures = (signatures) => {
         let txHashes = extractSignatures(signaturesArray);
 
         console.log('\n\n TXHASHES', txHashes);
-
+        
         txHashes.forEach( txHash => {
             getTx(txHash);
         })
@@ -77,12 +77,16 @@ const getTx = async (hash) => {
 
     await axios.get(`${baseURL}/txs/${hash}`)
     .then( (data) => {
-
         const memo = data.data.tx.value.memo;
         const txHash = data.data.txhash;
         const txType = data.data.tx.value.msg[0].type;
         const txTimeStamp = data.data.timestamp;
-        const txAmount = data.data.tx.value.fee.amount[0].amount;
+        let txAmount;
+        if (data.data.tx.value.fee.amount !== null) {
+            txAmount = data.data.tx.value.fee.amount[0].amount;
+        } else {
+            txAmount = '0';
+        }
         let txFromAddress;
         let txToAddress;
         let txDelAddress;
@@ -116,6 +120,7 @@ const getTx = async (hash) => {
         console.log(`TXValAddr is`, txValAddress)
 
         if (memo.match(isLunie)) {
+            console.log('\n\n Lunie transaction!!!!!!!!!!')
             let newTX = new TX({
                 hash: txHash,
                 kind: txType,
