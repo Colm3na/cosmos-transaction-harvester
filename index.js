@@ -39,23 +39,10 @@ const extractSignatures = (signatures) => {
 }
 
 const checkIsLunie = async (tx) => {
-    if (memo.match(isLunie)) {
+    if (tx.memo.match(isLunie)) {
         console.log('\n\n Lunie transaction!!!!!!!!!!')
-        let newTX = new TX({
-            hash: txHash,
-            kind: txType,
-            timestamp: txTimeStamp,
-            amount: txAmount,
-            from_addr: txFromAddress,
-            to_addr: txToAddress,
-            delegator_addr: txDelAddress,
-            validator_addr: txValAddress,
-            vote: {
-                proposal_id: txProposalID,
-                option: txVoteOption,
-            },
-        })
-        await TX.save();
+        await tx.save()
+        .catch( err => console.log(`There was an error: \n ${err}`))
     }
 }
 
@@ -97,7 +84,7 @@ const getTx = async (hash) => {
 
     await axios.get(`${baseURL}/txs/${hash}`)
     .then( (data) => {
-        console.log('\n\n PAY ATTENTION', data.data.tx.value.msg[0])
+
         let newTX = new TX;
 
         newTX.memo = data.data.tx.value.memo;
@@ -138,6 +125,7 @@ const getTx = async (hash) => {
         }
 
         console.log(`\n\n NEW TX is`, newTX)
+        checkIsLunie(newTX);
 
     })
     .catch( (error) => {
