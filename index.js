@@ -1,10 +1,7 @@
-const express = require('express');
 const axios = require('axios');
 const sha256 = require('js-sha256').sha256;
 const schema = require(__dirname + "/schema.js");
 require('dotenv').config()
-
-const app = express();
 
 const baseURL = process.env.STARGATE
 const mockHash = '64156BE924D6269AB385E404DFACFCF218633047AF3C879A4F0B8596C7F73C7B';
