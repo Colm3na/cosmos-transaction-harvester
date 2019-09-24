@@ -16,14 +16,17 @@ if (port == null || port == "") {
 let CURRENT_BLOCK;
 let NEXT_BLOCK;
 
-// // Get current block
-// axios.get(`${baseURL}:26657/status`)
-// .then( data => {
-//     console.log(data.data.result.sync_info.latest_block_height)
-// })
-// .catch( (error) => {
-//     console.log(error);
-// });
+const checkCurrentBlock = async () => {
+    await axios.get(`${baseURL}:26657/status`)
+    .then( data => {
+        console.log(data.data.result.sync_info.latest_block_height)
+        CURRENT_BLOCK = data.data.result.sync_info.latest_block_height;
+        return CURRENT_BLOCK;
+    })
+    .catch( (error) => {
+        console.log(error);
+    });
+}
 
 const extractSignatures = (signatures) => {
     let hashes = [];
@@ -38,44 +41,77 @@ const extractSignatures = (signatures) => {
 const checkIsLunie = async (tx) => {
     if (tx.memo.match(isLunie)) {
         console.log('\n\n Lunie transaction!!!!!!!!!!')
-        await tx.save()
+        await tx.save() // save tx into DB
         .catch( err => console.log(`There was an error: \n ${err}`))
     }
 }
 
-// setInterval( () => {
-    // axios.get(`${baseURL}/blocks/latest`)
-    axios.get(`${baseURL}/blocks/30227`) // Searching for a 'Sent from Lunie' memo
-    .then( data => {
-
+const getCurrentBlock = async () => {
+    await axios.get(`${baseURL}/blocks/latest`)
+    .then( (data) => {
         CURRENT_BLOCK = data.data.block.header.height;
-        NEXT_BLOCK = data.data.block.header.height;
-
-        let signaturesArray = data.data.block.data.txs;
-
-        let txHashes = extractSignatures(signaturesArray);
-
-        console.log('\n\n TXHASHES', txHashes);
-        
-        txHashes.forEach( txHash => {
-            getTx(txHash);
-        })
-
-        const checkBlock = () => {
-            console.log(CURRENT_BLOCK)
-            NEXT_BLOCK = data.data.block.header.height;
-            if(CURRENT_BLOCK < NEXT_BLOCK) {
-                console.log('\n\n NEXT')
-                console.log(data.data.block.header.height);
-            }
-        }
-
     })
     .catch( (error) => {
         console.log(error);
     });
-// }, 3000)
+}
 
+// main function
+const crawlBlock = async (height, current_height) => {
+    axios.get(`${baseURL}/blocks/${height}`)
+    .then( (data) => {
+        console.log('\n\n CURRENT HEIGHT IS', height, '\n')
+
+        let signaturesArray = data.data.block.data.txs;
+        let txHashes;
+        if (signaturesArray != null) {
+            txHashes = extractSignatures(signaturesArray);
+            console.log('\n\n TXHASHES', txHashes);
+            let counter = 0;
+
+            txHashes.forEach( (txHash, index, txHashes) => {
+                counter++;
+
+                if( counter === txHashes.length) {
+                    if ( height < current_height ) {
+                        height++;
+                        crawlBlock(height, current_height);
+                    }
+                }
+                getTx(txHash);
+            })
+
+        } else {
+            if ( height < current_height ) {
+                height++;
+                crawlBlock(height, current_height);
+            }
+        }
+    })
+    .catch( (error) => {
+        console.log(error);
+        crawlBlock(height, current_height);
+    });
+}
+
+// axios.get(`${baseURL}/blocks/30227`) // Searching for a 'Sent from Lunie' memo
+
+// go through the whole Cosmos chain, starting at genesis block
+const letsStart = () => {
+    getCurrentBlock()
+    .then( () => {
+        console.log('\n\n CURRENT BLOCK IS', CURRENT_BLOCK, '\n')
+        if (CURRENT_BLOCK != null) {
+            let height = 1;
+            crawlBlock(height, CURRENT_BLOCK);
+        } else {
+            console.log('\n REPEAT')
+            letsStart();
+        }
+    })
+}
+// here the action begins
+letsStart();
 
 const getTx = async (hash) => {
 
