@@ -41,7 +41,7 @@ const extractSignatures = (signatures) => {
 
 // setInterval( () => {
     // axios.get(`${baseURL}/blocks/latest`)
-    axios.get(`${baseURL}/blocks/893152`) // Searching for a 'Sent from Lunie' memo
+    axios.get(`${baseURL}/blocks/1154113`) // Searching for a 'Sent from Lunie' memo
     .then( data => {
         console.log(data.data)
         CURRENT_BLOCK = data.data.block.header.height;
@@ -91,12 +91,14 @@ const getTx = async (hash) => {
         let txToAddress;
         let txDelAddress;
         let txValAddress;
+        let txProposalID;
+        let txVoteOption;
 
         switch(txType) {
             case 'cosmos-sdk/MsgSend':
                 txFromAddress = data.data.tx.value.msg[0].value.from_address;
                 txToAddress = data.data.tx.value.msg[0].value.to_address;
-            break;
+                break;
             case 'cosmos-sdk/MsgWithdrawDelegationReward':
                 txDelAddress = data.data.tx.value.msg[0].value.delegator_address;
                 txValAddress = [];
@@ -104,7 +106,11 @@ const getTx = async (hash) => {
                 for( let i = 0; i < data.data.tx.value.msg.length; i++) {
                     txValAddress.push(data.data.tx.value.msg[i].value.validator_address)
                 }
-            break;
+                break;
+            case 'cosmos-sdk/MsgVote':
+                txProposalID = data.data.tx.value.msg[0].value.proposal_id;
+                txVoteOption = data.data.tx.value.msg[0].value.option;
+                break;
             default:
                 break;
         }
@@ -118,6 +124,8 @@ const getTx = async (hash) => {
         console.log(`txToAddress is`, txToAddress)
         console.log(`TXDelAddr is`, txDelAddress)
         console.log(`TXValAddr is`, txValAddress)
+        console.log(`TXProposalID is`, txProposalID)
+        console.log(`TXVoteOption is`, txVoteOption)
 
         if (memo.match(isLunie)) {
             console.log('\n\n Lunie transaction!!!!!!!!!!')
@@ -130,6 +138,10 @@ const getTx = async (hash) => {
                 to_addr: txToAddress,
                 delegator_addr: txDelAddress,
                 validator_addr: txValAddress,
+                vote: {
+                    proposal_id: txProposalID,
+                    option: txVoteOption,
+                },
             })
         }
     })

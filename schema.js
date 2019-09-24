@@ -40,6 +40,14 @@ const txSchema = mongoose.Schema({
         type: [String],
         required: true
     },
+    vote: {
+        proposal_id: {
+            type: String
+        },
+        option: {
+            type: String
+        },
+    },
 })
 
 const TX = mongo.model('TX', txSchema);
