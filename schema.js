@@ -15,6 +15,10 @@ const txSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    height: {
+        type: String,
+        required: true
+    },
     kind: {
         type: String,
         required: true
@@ -54,6 +58,14 @@ const txSchema = mongoose.Schema({
     },
 })
 
-const TX = mongo.model('TX', txSchema);
+const scannedBlockSchema = mongoose.Schema({
+    height: {
+        type: Number,
+        required: true
+    }
+})
 
-module.exports = { TX };
+const TX = mongo.model('TX', txSchema);
+const Block = mongo.model('Block', scannedBlockSchema);
+
+module.exports = { TX, Block };

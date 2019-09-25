@@ -7,6 +7,7 @@ const baseURL = process.env.STARGATE
 const mockHash = '64156BE924D6269AB385E404DFACFCF218633047AF3C879A4F0B8596C7F73C7B';
 // 6130997DA6C69A0B301271EB40889A33CEE48078F947493AB70B68097297DABB
 const TX = schema.TX;
+const Block = schema.Block;
 const isLunie = /^(Sent via Lunie)/;
 const port = process.env.DEFAULT_PORT;
 if (port == null || port == "") {
@@ -16,17 +17,6 @@ if (port == null || port == "") {
 let CURRENT_BLOCK;
 let NEXT_BLOCK;
 
-const checkCurrentBlock = async () => {
-    await axios.get(`${baseURL}:26657/status`)
-    .then( data => {
-        console.log(data.data.result.sync_info.latest_block_height)
-        CURRENT_BLOCK = data.data.result.sync_info.latest_block_height;
-        return CURRENT_BLOCK;
-    })
-    .catch( (error) => {
-        console.log(error);
-    });
-}
 
 const extractSignatures = (signatures) => {
     let hashes = [];
@@ -56,6 +46,25 @@ const getCurrentBlock = async () => {
     });
 }
 
+const avoidDuplicates = async (hash) => {
+    try {
+        const dupTX = await TX.findOne({hash: hash}, (err, tx) => {
+            console.log('\n\n Duplicate found: ', tx.hash)
+        });
+        console.log('\n\n Duplicate found: ', tx.hash)
+        return dupTX.height;
+    } catch (err) {
+        throw err;
+    }
+}
+
+const getLastScannedBlock = async () => {
+    const lastBlock = await Block.findOne().sort({ _id: -1 })
+
+    return lastBlock.toObject()
+}
+
+// axios.get(`${baseURL}/blocks/30227`) // Searching for a 'Sent from Lunie' memo
 // main function
 const crawlBlock = async (height, current_height) => {
     axios.get(`${baseURL}/blocks/${height}`)
@@ -69,6 +78,7 @@ const crawlBlock = async (height, current_height) => {
             console.log('\n\n TXHASHES', txHashes);
             let counter = 0;
 
+            // extract TX hashes from block and check them 
             txHashes.forEach( (txHash, index, txHashes) => {
                 counter++;
 
@@ -78,10 +88,20 @@ const crawlBlock = async (height, current_height) => {
                         crawlBlock(height, current_height);
                     }
                 }
+                // check TX to see if it comes from Lunie
                 getTx(txHash);
             })
 
+            // store Block's height in DB to keep track of scanned blocks
+            let lastBlock = new Block({height: height});
+            lastBlock.save();
+
         } else {
+
+            // store Block's height in DB to keep track of scanned blocks
+            let lastBlock = new Block({height: height});
+            lastBlock.save();
+
             if ( height < current_height ) {
                 height++;
                 crawlBlock(height, current_height);
@@ -89,29 +109,36 @@ const crawlBlock = async (height, current_height) => {
         }
     })
     .catch( (error) => {
-        console.log(error);
+        console.log('THERE WAS AN ERROR. RETRY')
+        console.log('\n\n HEIGHT IS', height)
         crawlBlock(height, current_height);
     });
 }
-
-// axios.get(`${baseURL}/blocks/30227`) // Searching for a 'Sent from Lunie' memo
+// for testing
+// crawlBlock(1, 190000)
 
 // go through the whole Cosmos chain, starting at genesis block
-const letsStart = () => {
+const start = () => {
     getCurrentBlock()
     .then( () => {
-        console.log('\n\n CURRENT BLOCK IS', CURRENT_BLOCK, '\n')
-        if (CURRENT_BLOCK != null) {
-            let height = 1;
-            crawlBlock(height, CURRENT_BLOCK);
-        } else {
-            console.log('\n REPEAT')
-            letsStart();
-        }
+        console.log('\n\n CURRENT BLOCK IS', CURRENT_BLOCK)
+
+        getLastScannedBlock().then( block => {
+            console.log('\n\n LAST SCANNED BLOCK WAS', block.height)
+            
+            if (CURRENT_BLOCK != null) {
+                let height = block.height;
+                crawlBlock(height, CURRENT_BLOCK);
+            } else {
+                console.log('\n REPEAT')
+                start();
+            }
+        })
+
     })
 }
 // here the action begins
-letsStart();
+start();
 
 const getTx = async (hash) => {
 
@@ -120,6 +147,7 @@ const getTx = async (hash) => {
 
         let newTX = new TX;
 
+        newTX.height = data.data.height;
         newTX.memo = data.data.tx.value.memo;
         newTX.hash = data.data.txhash;
         newTX.kind = data.data.tx.value.msg[0].type;
@@ -163,5 +191,6 @@ const getTx = async (hash) => {
     })
     .catch( (error) => {
         console.log(error);
+        getTx(hash);
     });
 }
