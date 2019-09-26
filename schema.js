@@ -28,8 +28,7 @@ const txSchema = mongoose.Schema({
         required: true
     },
     memo: {
-        type: String,
-        required: true
+        type: String
     },
     amount: {
         type: String,
@@ -61,6 +60,10 @@ const txSchema = mongoose.Schema({
 const scannedBlockSchema = mongoose.Schema({
     height: {
         type: Number,
+        required: true
+    },
+    scanDate: {
+        type: Date,
         required: true
     }
 })

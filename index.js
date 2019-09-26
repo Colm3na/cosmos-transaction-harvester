@@ -15,7 +15,6 @@ if (port == null || port == "") {
 }
   
 let CURRENT_BLOCK;
-let NEXT_BLOCK;
 
 
 const extractSignatures = (signatures) => {
@@ -28,14 +27,6 @@ const extractSignatures = (signatures) => {
     return hashes;
 }
 
-const checkIsLunie = async (tx) => {
-    if (tx.memo.match(isLunie)) {
-        console.log('\n\n Lunie transaction!!!!!!!!!!')
-        await tx.save() // save tx into DB
-        .catch( err => console.log(`There was an error: \n ${err}`))
-    }
-}
-
 const getCurrentBlock = async () => {
     await axios.get(`${baseURL}/blocks/latest`)
     .then( (data) => {
@@ -46,22 +37,29 @@ const getCurrentBlock = async () => {
     });
 }
 
-const avoidDuplicates = async (hash) => {
-    try {
-        const dupTX = await TX.findOne({hash: hash}, (err, tx) => {
-            console.log('\n\n Duplicate found: ', tx.hash)
-        });
-        console.log('\n\n Duplicate found: ', tx.hash)
-        return dupTX.height;
-    } catch (err) {
-        throw err;
+const avoidDupliAndSave = async (tx) => {
+
+    const dupTX = await TX.findOne({hash: tx.hash});
+
+    if (dupTX != null) {
+        console.log('\n DUPLICATE FOUND')
+        return true;
+    } else {
+        console.log('\n EVERYTHING is OK')
+        console.log('\n GOING TO SAVE')
+        await tx.save();
     }
+
 }
 
 const getLastScannedBlock = async () => {
-    const lastBlock = await Block.findOne().sort({ _id: -1 })
+    const lastBlock = await Block.findOne().sort({ _id: -1 });
 
-    return lastBlock.toObject()
+    if (lastBlock == null) {
+        return 1;
+    } else {
+        return lastBlock.height;
+    }
 }
 
 // axios.get(`${baseURL}/blocks/30227`) // Searching for a 'Sent from Lunie' memo
@@ -69,7 +67,7 @@ const getLastScannedBlock = async () => {
 const crawlBlock = async (height, current_height) => {
     axios.get(`${baseURL}/blocks/${height}`)
     .then( (data) => {
-        console.log('\n\n CURRENT HEIGHT IS', height, '\n')
+        console.log('\n CURRENT HEIGHT IS', height, '\n')
 
         let signaturesArray = data.data.block.data.txs;
         let txHashes;
@@ -93,13 +91,13 @@ const crawlBlock = async (height, current_height) => {
             })
 
             // store Block's height in DB to keep track of scanned blocks
-            let lastBlock = new Block({height: height});
+            let lastBlock = new Block({height: height, scanDate: Date()});
             lastBlock.save();
 
         } else {
 
             // store Block's height in DB to keep track of scanned blocks
-            let lastBlock = new Block({height: height});
+            let lastBlock = new Block({height: height, scanDate: Date()});
             lastBlock.save();
 
             if ( height < current_height ) {
@@ -109,13 +107,12 @@ const crawlBlock = async (height, current_height) => {
         }
     })
     .catch( (error) => {
-        console.log('THERE WAS AN ERROR. RETRY')
-        console.log('\n\n HEIGHT IS', height)
+        height--;
+        console.log(error)
+        console.log('\nTHERE WAS AN ERROR. RETRY')
         crawlBlock(height, current_height);
     });
 }
-// for testing
-// crawlBlock(1, 190000)
 
 // go through the whole Cosmos chain, starting at genesis block
 const start = () => {
@@ -123,11 +120,10 @@ const start = () => {
     .then( () => {
         console.log('\n\n CURRENT BLOCK IS', CURRENT_BLOCK)
 
-        getLastScannedBlock().then( block => {
-            console.log('\n\n LAST SCANNED BLOCK WAS', block.height)
+        getLastScannedBlock().then( height => {
+            console.log('\n\n LAST SCANNED BLOCK WAS', height)
             
             if (CURRENT_BLOCK != null) {
-                let height = block.height;
                 crawlBlock(height, CURRENT_BLOCK);
             } else {
                 console.log('\n REPEAT')
@@ -145,49 +141,54 @@ const getTx = async (hash) => {
     await axios.get(`${baseURL}/txs/${hash}`)
     .then( (data) => {
 
-        let newTX = new TX;
+        let memo = data.data.tx.value.memo;
 
-        newTX.height = data.data.height;
-        newTX.memo = data.data.tx.value.memo;
-        newTX.hash = data.data.txhash;
-        newTX.kind = data.data.tx.value.msg[0].type;
-        newTX.timestamp = data.data.timestamp;
+        if (memo.match(isLunie)) {
+            console.log('\n\n LUNIE Transaction!!!!!!!!!!')
 
-        if (data.data.tx.value.fee.amount !== null) {
-            newTX.amount = data.data.tx.value.fee.amount[0].amount;
-        } else {
-            newTX.amount = '0';
+            let newTX = new TX;
+
+            newTX.height = data.data.height;
+            newTX.memo = memo;
+            newTX.hash = data.data.txhash;
+            newTX.kind = data.data.tx.value.msg[0].type;
+            newTX.timestamp = data.data.timestamp;
+
+            if (data.data.tx.value.fee.amount !== null) {
+                newTX.amount = data.data.tx.value.fee.amount[0].amount;
+            } else {
+                newTX.amount = '0';
+            }
+
+            switch(newTX.kind) {
+                case 'cosmos-sdk/MsgSend':
+                    newTX.from_addr = data.data.tx.value.msg[0].value.from_address;
+                    newTX.to_addr = data.data.tx.value.msg[0].value.to_address;
+                    break;
+                case 'cosmos-sdk/MsgWithdrawDelegationReward':
+                    newTX.delegator_addr = data.data.tx.value.msg[0].value.delegator_address;
+                    newTX.validator_addr = [];
+                    
+                    for( let i = 0; i < data.data.tx.value.msg.length; i++) {
+                        newTX.validator_addr.push(data.data.tx.value.msg[i].value.validator_address)
+                    }
+                    break;
+                case 'cosmos-sdk/MsgVote':
+                    newTX.vote.proposal_id = data.data.tx.value.msg[0].value.proposal_id;
+                    newTX.vote.option = data.data.tx.value.msg[0].value.option;
+                    break;
+                case 'cosmos-sdk/MsgDelegate':
+                    newTX.delegator_addr = data.data.tx.value.msg[0].value.delegator_address;
+                    newTX.validator_addr = data.data.tx.value.msg[0].value.validator_address;
+                    newTX.amount = data.data.tx.value.msg[0].value.amount.amount;
+                    break;
+                default:
+                    break;
+            }
+
+            console.log(`\n\n NEW TX is`, newTX)
+            avoidDupliAndSave(newTX);
         }
-
-        switch(newTX.kind) {
-            case 'cosmos-sdk/MsgSend':
-                newTX.from_addr = data.data.tx.value.msg[0].value.from_address;
-                newTX.to_addr = data.data.tx.value.msg[0].value.to_address;
-                break;
-            case 'cosmos-sdk/MsgWithdrawDelegationReward':
-                newTX.delegator_addr = data.data.tx.value.msg[0].value.delegator_address;
-                newTX.validator_addr = [];
-                
-                for( let i = 0; i < data.data.tx.value.msg.length; i++) {
-                    newTX.validator_addr.push(data.data.tx.value.msg[i].value.validator_address)
-                }
-                break;
-            case 'cosmos-sdk/MsgVote':
-                newTX.vote.proposal_id = data.data.tx.value.msg[0].value.proposal_id;
-                newTX.vote.option = data.data.tx.value.msg[0].value.option;
-                break;
-            case 'cosmos-sdk/MsgDelegate':
-                newTX.delegator_addr = data.data.tx.value.msg[0].value.delegator_address;
-                newTX.validator_addr = data.data.tx.value.msg[0].value.validator_address;
-                newTX.amount = data.data.tx.value.msg[0].value.amount.amount;
-                break;
-            default:
-                break;
-        }
-
-        console.log(`\n\n NEW TX is`, newTX)
-        checkIsLunie(newTX);
-
     })
     .catch( (error) => {
         console.log(error);
