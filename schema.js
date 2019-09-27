@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
-mongoose.connect('mongodb://mongo:27017/transactionCollector', {
+mongoose.connect(`mongodb://${process.env.MONGODIR}:27017/transactionCollector`, {
     useNewUrlParser: true,
     useUnifiedTopology: true 
 })

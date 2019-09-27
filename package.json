@@ -4,7 +4,9 @@
   "description": "Technical test to apply as a backend dev at lunie",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "node test.js",
+    "start": "sed -i '$ d' .env && echo 'MONGODIR=localhost' >> .env && node index.js",
+    "docker": "sed -i '$ d' .env && echo 'MONGODIR=mongo' >> .env && docker-compose up"
   },
   "repository": {
     "type": "git",
@@ -24,8 +26,10 @@
   "homepage": "https://github.com/anagutjor/lunie-transaction-collector#readme",
   "dependencies": {
     "axios": "^0.19.0",
+    "chai": "^4.2.0",
     "dotenv": "^8.1.0",
     "js-sha256": "^0.9.0",
+    "mocha": "^6.2.0",
     "mongoose": "^5.7.1",
     "tendermint": "^4.0.8",
     "ws": "^7.1.2"
