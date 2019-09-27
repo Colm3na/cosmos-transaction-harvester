@@ -45,8 +45,7 @@ const txSchema = mongoose.Schema({
         type: String
     },
     validator_addr: {
-        type: [String],
-        required: true
+        type: [String]
     },
     vote: {
         proposal_id: {

@@ -95,5 +95,6 @@ const getTx = async (hash) => {
 
 module.exports = {
     extractSignatures,
+    avoidDupliAndSave,
     getTx,
 }
