@@ -1,0 +1,19 @@
+version: "2"
+services:
+  web:
+    container_name: transaction-collector
+    build: .
+    volumes:
+      - ./:/transaction-collector
+      - /transaction-collector/node_modules
+    # ports:
+    #   - "27017:27017"
+    links:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ./data:/data/db
+    expose:
+      - 27017

@@ -1,4 +1,6 @@
 node_modules
+data
+discarded.js
 .env
 .vscode
 trials.js
