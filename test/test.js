@@ -1,5 +1,5 @@
-const schema = require(__dirname + "/schema.js");
-const { extractSignatures, avoidDupliAndSave, getTx } = require('./aux-methods');
+const schema = require('../schema.js');
+const { extractSignatures, avoidDupliAndSave, getTx } = require('../src/aux-methods');
 const TX = schema.TX;
 const Block = schema.Block;
 const { tx0, block0, mockLunieTX, mockBlocks } = require('./mockdata');

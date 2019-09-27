@@ -1,4 +1,4 @@
-const methods = require('./methods');
+const methods = require('./src/methods');
 
 // go through the whole Cosmos chain, starting at genesis block
 const start = () => {

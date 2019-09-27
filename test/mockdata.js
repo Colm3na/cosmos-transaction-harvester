@@ -1,4 +1,4 @@
-const schema = require(__dirname + '/schema.js');
+const schema = require('../schema.js');
 
 const TX = schema.TX;
 const Block = schema.Block;
