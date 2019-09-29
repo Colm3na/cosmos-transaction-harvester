@@ -1,5 +1,5 @@
 const tendermint = require('tendermint');
-const { extractSignatures, getTx } = require('./aux-methods');
+const { extractSignatures, getTx } = require('./aux-functions');
 const schema = require('../schema');
 const Block = schema.Block;
 
@@ -9,7 +9,6 @@ const followBlockchain = () => {
 
     client.subscribe({ query: "tm.event = 'NewBlock'" }, event => {
     // client.subscribe({ query: "tm.event = 'Tx'" }, event => {
-        // "tm.event = 'Tx' AND tx.height = 3"
         console.log('\n NEW BLOCK')
         console.log('\n TX:', event.block.data.txs)
         // console.log(event.TxResult.result.tags)

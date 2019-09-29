@@ -1,5 +1,5 @@
 const schema = require('../schema.js');
-const { extractSignatures, avoidDupliAndSave, getTx } = require('../src/aux-methods');
+const { extractSignatures, avoidDupliAndSave, getTx } = require('../src/aux-functions');
 const TX = schema.TX;
 const Block = schema.Block;
 const { tx0, block0, mockLunieTX, mockBlocks } = require('./mockdata');

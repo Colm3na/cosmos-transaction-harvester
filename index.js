@@ -1,16 +1,19 @@
-const methods = require('./src/methods');
+const { getCurrentBlock, getLastScannedBlock, crawlBlock } = require('./src/functions');
 
-// go through the whole Cosmos chain, starting at genesis block
+/**
+ * go through the whole Cosmos chain, scanning each block,
+ * starting at block 1
+ */
 const start = () => {
-    methods.getCurrentBlock()
+    getCurrentBlock()
     .then( currentBlock => {
         console.log('\n\n CURRENT BLOCK IS', currentBlock)
 
-        methods.getLastScannedBlock().then( height => {
+        getLastScannedBlock().then( height => {
             console.log('\n\n LAST SCANNED BLOCK WAS', height)
             
             if (currentBlock != null) {
-                methods.crawlBlock(height, currentBlock);
+                crawlBlock(height, currentBlock);
             } else {
                 console.log('\n REPEAT')
                 start();

@@ -1,3 +1,5 @@
+// Auxiliar functions needed by the functions which directly interact with index.js
+
 const axios = require('axios');
 const sha256 = require('js-sha256').sha256;
 const schema = require('../schema');
@@ -6,7 +8,12 @@ const isLunie = /^(Sent via Lunie)/;
 require('dotenv').config();
 const baseURL = process.env.STARGATE;
 
-
+/**
+ * 
+ * @param {String} signatures 
+ * 
+ * takes the signature of a transaction and extracts its hash
+ */
 const extractSignatures = (signatures) => {
     let hashes = [];
     signatures.forEach( signature => {
@@ -17,6 +24,13 @@ const extractSignatures = (signatures) => {
     return hashes;
 }
 
+/**
+ * 
+ * @param {String} tx 
+ * 
+ * checks if the transaction was already saved in the DB.
+ * in case it wasn't, it saves it.
+ */
 const avoidDupliAndSave = async (tx) => {
 
     const dupTX = await TX.findOne({hash: tx.hash});
@@ -31,6 +45,15 @@ const avoidDupliAndSave = async (tx) => {
     }
 }
 
+/**
+ *
+ * @param {String} hash 
+ * 
+ * receives the hash of a transaction and checks if it comes from Lunie.
+ * If it comes from Lunie, takes all the parameters needed to save it as
+ * a transaction in the DB and finally sends it to avoidDupliAndSave()
+ * to save it in case it is not a duplicate.
+ */
 const getTx = async (hash) => {
 
     await axios.get(`${baseURL}/txs/${hash}`)
