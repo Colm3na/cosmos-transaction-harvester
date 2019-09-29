@@ -3,15 +3,15 @@ const { extractSignatures, getTx } = require('./aux-functions');
 const schema = require('../schema');
 const Block = schema.Block;
 
-
+/**
+ * subscribes to cosmos mainnet and logs new transactions signatures
+ */
 const followBlockchain = () => {
     const client = tendermint.RpcClient('wss://lunie.mariopino.es:46657')
 
     client.subscribe({ query: "tm.event = 'NewBlock'" }, event => {
-    // client.subscribe({ query: "tm.event = 'Tx'" }, event => {
         console.log('\n NEW BLOCK')
         console.log('\n TX:', event.block.data.txs)
-        // console.log(event.TxResult.result.tags)
         let signaturesArray = event.block.data.txs;
         let height = event.block.header.height;
 

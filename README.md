@@ -31,7 +31,7 @@ We propose a simple REST server, but you can also provide a shell script.
 
 ## Project Setup
 
-Don't forget to install MongoDB and start it first with `sudo service mongod start` in case you are using the non-dockerized version. 
+In case you are using the non-dockerized version, don't forget to install MongoDB and start it first with `sudo service mongod start`. 
 
 For docker, you just need to pull the mongo image:
 `docker pull mongo`
@@ -49,7 +49,9 @@ For docker, you just need to pull the mongo image:
 
 ### Run the not-dockerized version
 
-`npm run start` 
+`npm run start`
+OR
+`npm start` 
 OR
 `node index.js`
 
@@ -77,7 +79,7 @@ Now we have the database also in our local system.
 You could also connect to the docker `mongo` container with [Robo 3T](https://robomongo.org/) and creating a new connection using the container's ip in your system and port `27017`. 
 
 <div style="text-align:center">
-<img src="./assets/img/robo3t-docker.png" width="300px" style="margin: 20px;">
+<img src="./assets/img/robo3t-docker.png" width="650px" style="margin: 20px;">
 </div>
 
 To know the container's ip run this command, courtesy of StackOverflow: 
@@ -93,4 +95,4 @@ So I thank Mario for sharing with me his fantastic endpoint instead, at https://
 
 2. It is important to note that in order to be able ro run the the crawler in both a docker container and localhost, I used an environment variable in `schema.js`, `MONGODIR`. This variable will change its value depending on whether we use the `npm run start` script or the `npm run docker` one.
 
-The mechanism used to achieve this is quite straight-forward. Simply deleting the last line in the `.env` and rewriting it with the desired value.
+The mechanism used to achieve this is quite straight-forward. Simply deleting the last line in the `.env` and rewriting it with the desired value (either `localhost` or `mongo`, the container name).
