@@ -37,8 +37,8 @@ const crawlOrSubscribe = (height, current_height) => {
  * which is the responsible for checking if the transaction comes from Lunie and, 
  * in that case, save it.
  * 
- * It also keeps checking if the crawler already synced to switch to subscribing to
- * the chain with the followBlockchain() function.
+ * It also keeps checking if the crawler already synced with the Cosmos blockchain 
+ * to switch to subscribing to the chain with the followBlockchain() function.
  */
 const crawlBlock = async (height, current_height) => {
     axios.get(`${baseURL}/blocks/${height}`)
@@ -57,7 +57,12 @@ const crawlBlock = async (height, current_height) => {
                 counter++;
 
                 if( counter === txHashes.length) {
-                   crawlOrSubscribe( height, current_height)
+                    getCurrentBlock()
+                    .then ( blockchain_height => {
+                        current_height = blockchain_height;
+                        crawlOrSubscribe( height, current_height);
+                    })
+
                 }
                 // check TX to see if it comes from Lunie
                 getTx(txHash);
@@ -72,7 +77,11 @@ const crawlBlock = async (height, current_height) => {
             let lastBlock = new Block({height: height, scanDate: Date()});
             lastBlock.save();
 
-            crawlOrSubscribe( height, current_height)
+            getCurrentBlock()
+            .then ( blockchain_height => {
+                current_height = blockchain_height;
+                crawlOrSubscribe( height, current_height);
+            })
         }
     })
     .catch( (error) => {
