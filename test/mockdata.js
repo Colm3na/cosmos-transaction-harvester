@@ -35,44 +35,241 @@ const mockLunieTX = new TX({
     amount: '50000',
 })
 
-const mockBlocks = [
+const mockTXs = [
     {
-        txs: [ 'tAHwYl3uCjCMTXENChS9qylhiGPaDUEBgah/3lXsg1tnIRIUx8IB1mO1bXRY0vHThzr6b+PHVyESEAoKCgV1YXRvbRIBMRCgjQYaagom61rphyECPeTCBfk7afFDIubduqb1adR5uzFuIopW4kIpQfW4ZnMSQKIGOahdobYpSbldvHENAF4P86aa1Fw17wkpCjDFSxFOAc9HySg5/TDxtsUV4xEt5ILpZPeajeq+zAwZ4IXWW8s=' ]
+        "height": "30227",
+        "txhash": "6D1A3390F8672A5A95F332C067C7A1BAB80A4418ED877757A99547B058AF4874",    
+        "tags": [
+            {
+                "key": "action",
+                "value": "send"
+            },
+            {
+                "key": "sender",
+                "value": "cosmos1cwfj44ktgxe2493w6drrlvl4uuhnpj8t0a9d2c"
+            },
+            {
+                "key": "recipient",
+                "value": "cosmos1yeygh0y8rfyufdczhzytcl3pehsnxv9d3wsnlg"
+            }
+            ],
+            "tx": {
+                "type": "auth/StdTx",
+                "value": {
+                "msg": [
+                {
+                "type": "cosmos-sdk/MsgSend",
+                    "value": {
+                    "from_address": "cosmos1cwfj44ktgxe2493w6drrlvl4uuhnpj8t0a9d2c",
+                    "to_address": "cosmos1yeygh0y8rfyufdczhzytcl3pehsnxv9d3wsnlg",
+                    "amount": [
+                        {
+                            "denom": "uatom",
+                            "amount": "199895000"
+                        }
+                    ]
+                }
+            }
+        ],
+        "fee": {
+            "amount": [
+                {
+                    "denom": "uatom",
+                    "amount": "5000"
+                }
+                ],
+                "gas": "200000"
+            },
+                "memo": "Made by Circle with love"
+            }
+        },
+        "timestamp": "2019-04-25T02:26:04Z"
     },
     {
-        txs:['xAHwYl3uCjySHS5OChQm+iBfyvkJ0K2f1fWdzOuAl26WLRIUcEsp5ouOa957h0JyEr0ULJ4G3DkaCgoFdWF0b20SATESBBCaiQcaagom61rphyECVgvl/uEn59LNVTy525Sc7oeiRftYS9+9mDx1vEbqPt0SQKxAOMAXl/UFjIQXH4D1773hPg711Zc42yr2EgJwGUJzStetEwlOCFa9GA7+hZoufMuNCTf5H1D2/98ZKIO30DAiDlNlbnQgdmlhIEx1bmll',            // Sent via Lunie
-        '5QHwYl3uCkSoo2GaChTDkyrWy0GyqpYu00Y/s/XnLzDI6xIUJkiLvIcaScS3AriIvH4hzeEzMK0aEgoFdWF0b20SCTE5OTg5NTAwMBITCg0KBXVhdG9tEgQ1MDAwEMCaDBpqCibrWumHIQPxXANDlHvwVbyX6DTCj2hbBmN8PGJMjLwKvip0f0cEgxJAD3lJ3hOLvr0fU0HE8q70JkeOdgJwIpsnHfGSqwTU4fAtPdXu+sZhlowSE3Op3z0AGGDsJRUc1ZeGp0jgJFmLSSIYTWFkZSBieSBDaXJjbGUgd2l0aCBsb3Zl'] 
+        "height": "30227",
+        "txhash": "D89717AA69F96AB8DC4215448EE3279938C0947F965EC8CF77A3E50D257BE235",    
+        "tags": [
+            {
+                    "key": "action",
+                    "value": "delegate"
+                },
+                {
+                    "key": "delegator",
+                    "value": "cosmos1ymazqh72lyyaptvl6h6emn8tsztka93djc07l4"
+                },
+                {
+                    "key": "destination-validator",
+                    "value": "cosmosvaloper1wp9jne5t3e4au7u8gfep90g59j0qdhpeqvlg7n"
+                }
+            ],
+        "tx": {
+            "type": "auth/StdTx",
+            "value": {
+            "msg": [
+            {
+            "type": "cosmos-sdk/MsgDelegate",
+                "value": {
+                    "delegator_address": "cosmos1ymazqh72lyyaptvl6h6emn8tsztka93djc07l4",
+                    "validator_address": "cosmosvaloper1wp9jne5t3e4au7u8gfep90g59j0qdhpeqvlg7n",
+                "amount":
+                    {
+                        "denom": "uatom",
+                        "amount": "1"
+                    }
+                }
+            }
+        ],
+        "fee": {
+            "amount": null,
+            "gas": "115866"
+            },
+                "memo": "Sent via Lunie"
+            }
+        },
+        "timestamp": "2019-04-25T02:26:04Z"
     },
     {
-        txs: [ 'tAHwYl3uCjCMTXENChS9qylhiGPaDUEBgah/3lXsg1tnIRIUG678G75TYk/mI6/OhvmEDce5EVYSEAoKCgV1YXRvbRIBMRCgjQYaagom61rphyECPeTCBfk7afFDIubduqb1adR5uzFuIopW4kIpQfW4ZnMSQOL8FneZdq2RU5xVm8At++TPCKa4Bakj9eS0li7KcahqDYM5uaVudprzTpcO+DqwsChlBhsk/7+a1UaOzyEuXA4=' ]
+        "height": "4925",
+        "txhash": "B0A79E4C2539132782DF19D46E97BC3D4874A548836A722E69C4091AAE20ED79",    
+        "tags": [
+            {
+                "key": "action",
+                "value": "send"
+            },
+            {
+                "key": "sender",
+                "value": "cosmos1ymazqh72lyyaptvl6h6emn8tsztka93djc07l4"
+            },
+            {
+                "key": "recipient",
+                "value": "cosmos1ymazqh72lyyaptvl6h6emn8tsztka93djc07l4"
+            }
+            ],
+            "tx": {
+                "type": "auth/StdTx",
+                "value": {
+                "msg": [
+                {
+                "type": "cosmos-sdk/MsgSend",
+                    "value": {
+                    "from_address": "cosmos1ymazqh72lyyaptvl6h6emn8tsztka93djc07l4",
+                    "to_address": "cosmos1ymazqh72lyyaptvl6h6emn8tsztka93djc07l4",
+                    "amount": [
+                        {
+                            "denom": "uatom",
+                            "amount": "10000"
+                        }
+                    ]
+                }
+            }
+        ],
+        "fee": {
+                "amount": null,
+                "gas": "35287"
+            },
+                "memo": "Sent via Lunie"
+            }
+        },
+        "timestamp": "2019-04-23T02:24:27Z"
     },
     {
-        txs: ['2wHwYl3uCkSSHS5OChQ00Zjjmo0VCKBgbGUHVGDIL8S79RIUdnVp7ODo173dQ3gSGAtBA+Hs7ZEaEgoFdWF0b20SCTUwMDAwMDAwMBITCg0KBXVhdG9tEgQyODU5ELD9BhpqCibrWumHIQPcu10gUQHgTmIF7FCEXgVqCL/nVrr1eQT5ON4MC/rSgBJA1H0B3z3iBTpuwnbXfXq0JkQluUh6MYwf6+LtkHaIpcglIEETMkk9eOdAvB8+zU7cRIlaW108BfQCihedS+yjlyIOU2VudCB2aWEgTHVuaWU='] // Sent via Lunie
+        "height": "30227",
+        "txhash": "6D1A3390F8672A5A95F332C067C7A1BAB80A4418ED877757A99547B058AF4874",    
+        "tags": [
+            {
+                "key": "action",
+                "value": "send"
+            },
+            {
+                "key": "sender",
+                "value": "cosmos1cwfj44ktgxe2493w6drrlvl4uuhnpj8t0a9d2c"
+            },
+            {
+                "key": "recipient",
+                "value": "cosmos1yeygh0y8rfyufdczhzytcl3pehsnxv9d3wsnlg"
+            }
+            ],
+            "tx": {
+                "type": "auth/StdTx",
+                "value": {
+                "msg": [
+                {
+                "type": "cosmos-sdk/MsgSend",
+                    "value": {
+                    "from_address": "cosmos1cwfj44ktgxe2493w6drrlvl4uuhnpj8t0a9d2c",
+                    "to_address": "cosmos1yeygh0y8rfyufdczhzytcl3pehsnxv9d3wsnlg",
+                    "amount": [
+                        {
+                            "denom": "uatom",
+                            "amount": "199895000"
+                        }
+                    ]
+                }
+            }
+        ],
+        "fee": {
+            "amount": [
+                {
+                    "denom": "uatom",
+                    "amount": "5000"
+                }
+                ],
+                "gas": "200000"
+            },
+                "memo": "Made by Circle with love"
+            }
+        },
+        "timestamp": "2019-04-25T02:26:04Z"
     },
     {
-        txs: [ 'lwLwYl3uCjCMTXENChSaZEwfgu68YGgUp8EgLnlc6SVP0xIUG678G75TYk/mI6/OhvmEDce5EVYKQJIdLk4KFJpkTB+C7rxgaBSnwSAueVzpJU/TEhQbrvwbvlNiT+Yjr86G+YQNx7kRVhoOCgV1YXRvbRIFODU0ODISEgoMCgV1YXRvbRIDNjkwEPCEDhpqCibrWumHIQKV/vqylrIyMmfe++AdPs4wH5syrbSrN0/npBteID3hoxJAmYpTIlIHk31dObfAwUU+Yeq5G3NzMtV9ihK2wUjfKPA4DO+XlHniaF5VmXFvMFOAscaz08DL/2BcKgq26TruhSIdUmVpbnZlc3QgcmV3YXJkcyBmcm9tIGltVG9rZW4=',
-        '0QHwYl3uCkNcgIENChRe5uvcQ/GiJGJKY/pI9AeiutZwMRIUhL/4TH3a0Ry4wHOG6RkoxWdcpLwaEQoFdWF0b20SCDE2MTMxMDAwEhMKDQoFdWF0b20SBDEwMDAQwJoMGmoKJuta6YchAuq4UC+Tr7s5/2CaGyqQ5ovr+bZ84JEXaX5DxUuYtrLlEkB8aJoD9glope8z0lKTW318r5OSPlvBU3Bku6Yxu8Y0aC2i/KQK5v3R9nPbjPZrw+S1IKYlyczvro4oIlNsWmHqIgV3ZXRleg==' ]
-    },
-    {
-        txs: [ '3gHwYl3uCkGSHS5OChSaZEwfgu68YGgUp8EgLnlc6SVP0xIUG678G75TYk/mI6/OhvmEDce5EVYaDwoFdWF0b20SBjEwMDAwMBISCgwKBXVhdG9tEgM0NTAQ8JMJGmoKJuta6YchApX++rKWsjIyZ9774B0+zjAfmzKttKs3T+ekG14gPeGjEkBXd3PKP7cNknH7xvs25swAJKhQZpb6t3P926BdikN4tVxI4FXv4vEf3clW5znecT8K2KLvAsQq6FqGMARYTpWVIhVkZWxlZ2F0ZSBmcm9tIGltVG9rZW4=' ]
-    },
-    {
-        txs: [ 'ygHwYl3uCkKoo2GaChQoyq28xYHSUuQT3ohIY7Tnx8HXfBIUGNK1Yw0SqV5s7pgOLqbuimGK7/EaEAoFdWF0b20SBzM3NzUwMDASEgoMCgV1YXRvbRIDNzAzELXbARpqCibrWumHIQPRNqKbe9/JaEa4MdgRdpFZDQZM7ZigxYd1GvLEUqymXBJAnqIF/dcQBnVw5PN4kLLl1RvKhRF3VpQGzlQTNU29Z7J+Sy7Rr5EkC+mJ3sM01ORCc9Mcha6nClumHISAuffbVyIA' ]
-    },
-    {
-        txs: [ 'yQHwYl3uCkSoo2GaChSlIMhqCDZpQc2Q0i4RrBx+76LbNxIUWYCZ0lvC4PM8HrDaaR1oSU65PLoaEgoFdWF0b20SCTE3NzAwMDAwMBIRCgsKBXVhdG9tEgIzMBCw6gEaagom61rphyED8/RMnoDiztwaKQljGjreqIZu4yGH900JEjhzWbD/NqISQEe0AMviQiVcOczTbdFFSZNUYAOXQjf+UhK7LkMVAqL3Kcm3+9NaiIjHMf0FLARR07LkInq5mVBbeSY8jJQroHw=' ]
-    },
-    {
-        txs: [ 'xwHwYl3uCkKoo2GaChQY0rVjDRKpXmzumA4upu6KYYrv8RIUq0izqf/bcjC9KKaypXahrJ4NTiQaEAoFdWF0b20SBzM3NzQ5OTASEQoLCgV1YXRvbRICMTAQwJoMGmoKJuta6YchAiIOk21zzoM/z6LR0UQqtZ7cUgpVzTp5HwMOqk/wJE2rEkAvBd0K+eGlE485m9m90XFDj6J8hn36C524/oXHdtlCuB9XvbFJuQcXH8Hi5cKf84A+OW4XpwqOxC3g1nk1dcQK',
-        '4wHwYl3uCkKoo2GaChRcWAQCX7PELBoqly4AXDOnejejkBIUxJDjs74llbIl7vGZGDnhi3qnfT8aEAoFdWF0b20SBzE5ODgwMDASEwoNCgV1YXRvbRIENTAwMBDAmgwaagom61rphyEDQeGQnFfjkTut00L8PhZ+/00tXBvHzqDI5rzBzBBtC0MSQNPaL7VbGRoWQa+1GV0KEDCfLDnp9idDU7oNR+e3gf9fW3IDk2Sa3VmuPrIX4m7KKPCD2cKxK6v61C0N7OfhSVgiGFNUQUtJTkcgV0lUSERSQVcgUkVRVUVTVA==' ]
-    },
-    {
-        txs: [ '3gHwYl3uCkGSHS5OChSaZEwfgu68YGgUp8EgLnlc6SVP0xIUG678G75TYk/mI6/OhvmEDce5EVYaDwoFdWF0b20SBjEwMDAwMBISCgwKBXVhdG9tEgM0NTAQ8JMJGmoKJuta6YchApX++rKWsjIyZ9774B0+zjAfmzKttKs3T+ekG14gPeGjEkBXd3PKP7cNknH7xvs25swAJKhQZpb6t3P926BdikN4tVxI4FXv4vEf3clW5znecT8K2KLvAsQq6FqGMARYTpWVIhVkZWxlZ2F0ZSBmcm9tIGltVG9rZW4=' ]
-    },
-    {
-        txs: [ 'mALwYl3uCjCMTXENChSpzLaTg6aNRldvCWWlR4DD0itu8RIUG678G75TYk/mI6/OhvmEDce5EVYKQZIdLk4KFKnMtpODpo1GV28JZaVHgMPSK27xEhQbrvwbvlNiT+Yjr86G+YQNx7kRVhoPCgV1YXRvbRIGMTYxOTEzEhIKDAoFdWF0b20SAzY5MBDwhA4aagom61rphyECOV2/n6BNIe5FlkyKrImFZslEHjlRu4Ii/pkNfDxR6LsSQGjRiu/17tOeuQP0WeaXfExM7s5KjL1mNSnmfGGUVbriR9urRo+e4gZYKTcxPRWjYGUbz0c8M12e9/TKDhnGNGQiHVJlaW52ZXN0IHJld2FyZHMgZnJvbSBpbVRva2Vu',
-        'yAHwYl3uCkSoo2GaChRZgJnSW8Lg8zwesNppHWhJTrk8uhIUmSc4HyYqQahKSZHt4pN2aKsALu8aEgoFdWF0b20SCTE3Njk5OTk5ORIQCgoKBXVhdG9tEgExEKCNBhpqCibrWumHIQOahXCQSbxCv3zphAGNAxzVsEkWfUxHzWch/FaFbw7QKhJAyZmPQIEL+hXBz9rSZZDIr0cEzd0ikL3b3XUJW3HGRxBhIwpKZCyJYVKxHhGPlHKhqyyKqVPzs+m1zGtjyTevGw==' ]
+        "height": "5172",
+        "txhash": "F2EAB64512C1D9FE6C195C19131B65BA858489499DBF978DDAC977FC63614FD1",    
+        "tags": [
+            {
+                "key": "action",
+                "value": "send"
+            },
+            {
+                "key": "sender",
+                "value": "cosmos1w7r7juymfdfk5gwjrn4m9ed8c6t7z0mv2j2tdj"
+            },
+            {
+                "key": "recipient",
+                "value": "cosmos1s8n824e5p5chavmq6j2se3npxyquvxttxy6ass"
+            }
+            ],
+            "tx": {
+                "type": "auth/StdTx",
+                "value": {
+                "msg": [
+                {
+                "type": "cosmos-sdk/MsgSend",
+                    "value": {
+                    "from_address": "cosmos1w7r7juymfdfk5gwjrn4m9ed8c6t7z0mv2j2tdj",
+                    "to_address": "cosmos1s8n824e5p5chavmq6j2se3npxyquvxttxy6ass",
+                    "amount": [
+                        {
+                            "denom": "uatom",
+                            "amount": "1000000"
+                        }
+                    ]
+                }
+            }
+        ],
+        "fee": {
+            "amount": [
+                {
+                    "denom": "uatom",
+                    "amount": "975"
+                }
+                ],
+                "gas": "38971"
+            },
+                "memo": "I was Lunie once"
+            }
+        },
+        "timestamp": "2019-04-23T02:52:42Z"
     },
 ]
 
-module.exports = {tx0, block0, mockLunieTX, mockBlocks}
+module.exports = {tx0, block0, mockLunieTX, mockTXs}

@@ -1,16 +1,16 @@
 const schema = require('../schema.js');
-const { extractSignatures, avoidDupliAndSave, getTx } = require('../src/aux-functions');
+const { avoidDupliAndSave, getTx } = require('../src/aux-functions');
 const { getLastScannedBlock } = require('../src/functions');
 const followBlockchain = require('../src/subscribe');
 const TX = schema.TX;
 const Block = schema.Block;
-const { tx0, block0, mockLunieTX, mockBlocks } = require('./mockdata');
+const { tx0, block0, mockLunieTX, mockTXs } = require('./mockdata');
 
 
 beforeAll( () => { console.log('BEGINNING TESTS') });
 
 // after all will kill all the open handles left by Jest
-afterAll(() => setTimeout(() => process.exit(), 3000))
+afterAll(() => setTimeout(() => process.exit(), 4000))
 
 describe('DB connection & Saving avaliability', () => {
 
@@ -42,11 +42,6 @@ describe('DB connection & Saving avaliability', () => {
 
 describe('Checks functions with mock data', () => {
 
-    it('Should extract two hashes', () => {
-        const hashes = extractSignatures(mockBlocks[1].txs);
-        expect(hashes.length).toBe(2);
-    })
-
     it('Should save a Lunie transaction', async () => {
         try {
             await avoidDupliAndSave(mockLunieTX);
@@ -60,10 +55,9 @@ describe('Checks functions with mock data', () => {
 
     it('Should find and save a Lunie transaction in DB', async () => {
         try {
-            const hash = extractSignatures(mockBlocks[3].txs);
+            const hash = mockTXs[1]['txhash'];
             await getTx(hash);
-            let savedHash = hash[0].toUpperCase();
-            const savedTX = await TX.findOne({hash: savedHash});
+            const savedTX = await TX.findOne({hash});
             expect(savedTX).toBeTruthy();
         } catch (error) {
             throw error;

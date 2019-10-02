@@ -1,6 +1,6 @@
 // Here there are the functions that directly interact with the start() function
 
-const { getTx, extractSignatures } = require('./aux-functions');
+const { getTx } = require('./aux-functions');
 const axios = require('axios');
 const schema = require('../schema');
 const followBlockchain = require('./subscribe');
@@ -41,14 +41,15 @@ const crawlOrSubscribe = (height, current_height) => {
  * to switch to subscribing to the chain with the followBlockchain() function.
  */
 const crawlBlock = async (height, current_height) => {
-    axios.get(`${baseURL}/blocks/${height}`)
+    axios.get(`${baseURL}/txs?tx.height=${height}`)
     .then( (data) => {
         console.log('\n CURRENT HEIGHT IS', height)
+        console.log('\n DATA IS', data.data)
 
-        let signaturesArray = data.data.block.data.txs;
-        let txHashes;
-        if (signaturesArray != null) {
-            txHashes = extractSignatures(signaturesArray);
+        if ( data.data.length > 0 ) {
+
+            // data.map( data => data.tx);
+            let txHashes = data.data.map( tx => tx.txhash );
             console.log('\n\n TXHASHES', txHashes);
             let counter = 0;
 

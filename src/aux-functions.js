@@ -8,21 +8,6 @@ const isLunie = /^(Sent via Lunie)/;
 require('dotenv').config();
 const baseURL = process.env.STARGATE;
 
-/**
- * 
- * @param {String} signatures 
- * 
- * takes the signature of a transaction and extracts its hash
- */
-const extractSignatures = (signatures) => {
-    let hashes = [];
-    signatures.forEach( signature => {
-        let buf = Buffer.from(signature, 'base64');
-        let txHash = sha256(buf);
-        hashes.push(txHash);
-    })
-    return hashes;
-}
 
 /**
  * 
@@ -115,7 +100,6 @@ const getTx = async (hash) => {
 }
 
 module.exports = {
-    extractSignatures,
     avoidDupliAndSave,
     getTx,
 }
