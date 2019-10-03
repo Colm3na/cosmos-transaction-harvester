@@ -32,71 +32,64 @@ const avoidDupliAndSave = async (tx) => {
 
 /**
  *
- * @param {String} hash 
+ * @param {String} tx 
  * 
- * receives the hash of a transaction and checks if it comes from Lunie.
+ * receives the data of a transaction and checks if it comes from Lunie.
  * If it comes from Lunie, takes all the parameters needed to save it as
  * a transaction in the DB and finally sends it to avoidDupliAndSave()
  * to save it in case it is not a duplicate.
  */
-const getTx = async (hash) => {
+const getTx = async (tx) => {
+    console.log('\n\n Transaction is', tx)
 
-    await axios.get(`${baseURL}/txs/${hash}`)
-    .then( (data) => {
+    let memo = tx.tx.value.memo;
 
-        let memo = data.data.tx.value.memo;
+    if (memo.match(isLunie)) {
+        console.log('\n\n LUNIE Transaction!!!!!!!!!!')
 
-        if (memo.match(isLunie)) {
-            console.log('\n\n LUNIE Transaction!!!!!!!!!!')
+        let newTX = new TX;
 
-            let newTX = new TX;
+        newTX.height = tx.height;
+        newTX.memo = memo;
+        newTX.hash = tx.txhash;
+        newTX.kind = tx.tx.value.msg[0].type;
+        newTX.timestamp = tx.timestamp;
 
-            newTX.height = data.data.height;
-            newTX.memo = memo;
-            newTX.hash = data.data.txhash;
-            newTX.kind = data.data.tx.value.msg[0].type;
-            newTX.timestamp = data.data.timestamp;
-
-            if (data.data.tx.value.fee.amount !== null) {
-                newTX.amount = data.data.tx.value.fee.amount[0].amount;
-            } else {
-                newTX.amount = '0';
-            }
-
-            switch(newTX.kind) {
-                case 'cosmos-sdk/MsgSend':
-                    newTX.from_addr = data.data.tx.value.msg[0].value.from_address;
-                    newTX.to_addr = data.data.tx.value.msg[0].value.to_address;
-                    break;
-                case 'cosmos-sdk/MsgWithdrawDelegationReward':
-                    newTX.delegator_addr = data.data.tx.value.msg[0].value.delegator_address;
-                    newTX.validator_addr = [];
-                    
-                    for( let i = 0; i < data.data.tx.value.msg.length; i++) {
-                        newTX.validator_addr.push(data.data.tx.value.msg[i].value.validator_address)
-                    }
-                    break;
-                case 'cosmos-sdk/MsgVote':
-                    newTX.vote.proposal_id = data.data.tx.value.msg[0].value.proposal_id;
-                    newTX.vote.option = data.data.tx.value.msg[0].value.option;
-                    break;
-                case 'cosmos-sdk/MsgDelegate':
-                    newTX.delegator_addr = data.data.tx.value.msg[0].value.delegator_address;
-                    newTX.validator_addr = data.data.tx.value.msg[0].value.validator_address;
-                    newTX.amount = data.data.tx.value.msg[0].value.amount.amount;
-                    break;
-                default:
-                    break;
-            }
-
-            console.log(`\n\n NEW TX is`, newTX)
-            avoidDupliAndSave(newTX);
+        if (tx.tx.value.fee.amount !== null) {
+            newTX.amount = tx.tx.value.fee.amount[0].amount;
+        } else {
+            newTX.amount = '0';
         }
-    })
-    .catch( (error) => {
-        console.log(error);
-        getTx(hash);
-    });
+
+        switch(newTX.kind) {
+            case 'cosmos-sdk/MsgSend':
+                newTX.from_addr = tx.tx.value.msg[0].value.from_address;
+                newTX.to_addr = tx.tx.value.msg[0].value.to_address;
+                break;
+            case 'cosmos-sdk/MsgWithdrawDelegationReward':
+                newTX.delegator_addr = tx.tx.value.msg[0].value.delegator_address;
+                newTX.validator_addr = [];
+                
+                for( let i = 0; i < tx.tx.value.msg.length; i++) {
+                    newTX.validator_addr.push(tx.tx.value.msg[i].value.validator_address)
+                }
+                break;
+            case 'cosmos-sdk/MsgVote':
+                newTX.vote.proposal_id = tx.tx.value.msg[0].value.proposal_id;
+                newTX.vote.option = tx.tx.value.msg[0].value.option;
+                break;
+            case 'cosmos-sdk/MsgDelegate':
+                newTX.delegator_addr = tx.tx.value.msg[0].value.delegator_address;
+                newTX.validator_addr = tx.tx.value.msg[0].value.validator_address;
+                newTX.amount = tx.tx.value.msg[0].value.amount.amount;
+                break;
+            default:
+                break;
+        }
+
+        console.log(`\n\n NEW TX is`, newTX)
+        avoidDupliAndSave(newTX);
+    }
 }
 
 module.exports = {

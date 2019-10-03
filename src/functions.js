@@ -44,29 +44,20 @@ const crawlBlock = async (height, current_height) => {
     axios.get(`${baseURL}/txs?tx.height=${height}`)
     .then( (data) => {
         console.log('\n CURRENT HEIGHT IS', height)
-        console.log('\n DATA IS', data.data)
 
         if ( data.data.length > 0 ) {
-
-            // data.map( data => data.tx);
-            let txHashes = data.data.map( tx => tx.txhash );
-            console.log('\n\n TXHASHES', txHashes);
-            let counter = 0;
-
-            // extract TX hashes from block and check them 
-            txHashes.forEach( (txHash, index, txHashes) => {
-                counter++;
-
-                if( counter === txHashes.length) {
-                    getCurrentBlock()
-                    .then ( blockchain_height => {
-                        current_height = blockchain_height;
-                        crawlOrSubscribe( height, current_height);
-                    })
-
-                }
+            
+            data.data.forEach( tx => {
                 // check TX to see if it comes from Lunie
-                getTx(txHash);
+                getTx(tx);
+            })
+
+            // check if crawler should keep syncing with the chain
+            // or should go on to subscribe for new blocks
+            getCurrentBlock()
+            .then ( blockchain_height => {
+                current_height = blockchain_height;
+                crawlOrSubscribe( height, current_height);
             })
 
             // store Block's height in DB to keep track of scanned blocks
