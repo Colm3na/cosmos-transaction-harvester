@@ -31,6 +31,12 @@ We propose a simple REST server, but you can also provide a shell script.
 
 ## Project Setup
 
+First, you need to create a `env` file with the following lines:
+```
+STARGATE=https://lunie.mariopino.es:9070
+MONGODIR=mongo
+```
+
 In case you are using the non-dockerized version, don't forget to install MongoDB and start it first with `sudo service mongod start`. 
 
 For docker, you just need to pull the mongo image:
